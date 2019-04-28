@@ -1,7 +1,7 @@
 # windows-headset-buttons
 # Copyright (C) 2019 jack01. Released under the MIT License (see LICENSE for details).
 
-import sounddevice, win32api, win32con, signal, threading
+import sounddevice, struct, win32api, win32con, signal, threading
 
 VK_MEDIA_NEXT_TRACK = 0xB0;
 VK_MEDIA_PLAY_PAUSE = 0xB3;
@@ -9,7 +9,7 @@ VK_MEDIA_PREV_TRACK = 0xB1;
 
 sample_rate = 1024
 stream_block_size = 64
-press_amplitude_threshold = -0.3
+press_amplitude_threshold = -10000
 press_duration_threshold = 0.1875
 multi_press_interval = 0.375
 
@@ -18,11 +18,12 @@ multi_press_blocks = sample_rate / stream_block_size * multi_press_interval
 
 class Sampler:
     def __init__(self):
-        self.stream = sounddevice.InputStream(
+        self.stream = sounddevice.RawInputStream(
             samplerate=sample_rate,
             blocksize=stream_block_size,
             channels=1,
-            callback=self.stream_callback
+            callback=self.stream_callback,
+            dtype='int16'
         )
         self.stream.start()
         self.press_timer = 0
@@ -31,8 +32,8 @@ class Sampler:
         self.triggered = False
 
     def stream_callback(self, indata, frames, time, status):
-        peak = min([x[0] for x in indata[:]])
-
+        peak = min([x[0] for x in struct.iter_unpack('h', indata)])
+        
         if self.multi_press_timer > 0 and self.multi_press_timer < multi_press_blocks:
             self.multi_press_timer += 1
         elif self.multi_press_timer >= multi_press_blocks:
