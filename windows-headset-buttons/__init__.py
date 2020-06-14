@@ -1,7 +1,7 @@
 # windows-headset-buttons
 # Copyright (C) 2019 jack01. Released under the MIT License (see LICENSE for details).
 
-import sounddevice, struct, win32api, win32con, signal, threading
+import sounddevice, struct, win32api, signal, threading
 
 VK_MEDIA_NEXT_TRACK = 0xB0;
 VK_MEDIA_PLAY_PAUSE = 0xB3;
@@ -33,7 +33,7 @@ class Sampler:
 
     def stream_callback(self, indata, frames, time, status):
         peak = min([x[0] for x in struct.iter_unpack('h', indata)])
-        
+
         if self.multi_press_timer > 0 and self.multi_press_timer < multi_press_blocks:
             self.multi_press_timer += 1
         elif self.multi_press_timer >= multi_press_blocks:

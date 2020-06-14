@@ -3,4 +3,4 @@ Program that allows the media control buttons on headphones/headsets to be used 
 
 ### Build
 `auto-py-to-exe windows-headset-buttons/__init__.py`
-pyinstaller -y -F "windows-headset-buttons/__init__.py"
+`pyinstaller -y -F "windows-headset-buttons/__init__.py"`
